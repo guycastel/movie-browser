@@ -1,162 +1,101 @@
-# React + TypeScript + Vite Template
+# Movie Browser App
 
-A clean, minimal template for starting new React projects with modern tooling.
+A React-based movie browsing application that allows users to discover movies from any year using The Movie Database (TMDB) API.
 
-## 🚀 Features
+## Features
 
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **CSS Modules** for scoped styling
-- **clsx** for conditional class names
-- **ESLint** for code quality
-- **Stylelint** for CSS linting
-- **Prettier** for code formatting
-- **npm** as package manager
+- **Birth Year Selection**: Dropdown with years from 1900 to current year
+- **Movie Discovery**: Fetches movies from TMDB API based on selected year
+- **Responsive Grid Layout**: 
+  - 4 movies per row on large screens
+  - 3 movies per row on medium screens
+  - 2 movies per row on small screens
+  - 1 movie per row on mobile
+- **Pagination**: Browse through multiple pages of results
+- **Movie Information**: Each movie shows poster, title, and release year
+- **Lazy Loading**: Movie posters load asynchronously with loading skeletons
+- **Error Handling**: Graceful error handling for API failures
 
-## 📦 Getting Started
+## Setup Instructions
 
-1. Clone this repository or use it as a template
-2. Install dependencies:
+### 1. Get TMDB API Key
+
+1. Create an account at [The Movie Database](https://www.themoviedb.org/)
+2. Go to Settings > API in your account
+3. Create a new API key (v3 auth)
+4. Copy your API key
+
+### 2. Configure Environment
+
+1. Copy `.env.example` to `.env.local` in your project root:
    ```bash
-   npm install
+   cp .env.example .env.local
    ```
-3. Start development server:
-   ```bash
-   npm run dev
-   ```
+2. Edit `.env.local` and replace `your_api_key_here` with your actual TMDB API key:
 
-## 📜 Available Scripts
+```bash
+VITE_TMDB_API_KEY=your_actual_api_key_here
+```
+
+### 3. Install and Run
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`
+
+## Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Run ESLint with auto-fix
-- `npm run lint:css` - Run Stylelint on CSS files
-- `npm run lint:css:fix` - Run Stylelint with auto-fix
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 
-## 🛠️ Project Structure
+## Usage
 
-```
-src/
-├── App.tsx              # Main App component
-├── App.module.css       # App styles (CSS Modules)
-├── main.tsx             # App entry point
-├── index.css            # Global styles
-├── components/
-│   └── Button/          # Example Button component
-│       ├── Button.tsx
-│       ├── Button.module.css
-│       └── index.ts
-├── types/
-│   └── css.d.ts         # CSS Modules TypeScript definitions
-└── assets/              # Static assets
-```
+1. **Select Birth Year**: Choose your birth year from the dropdown
+2. **Click "Go!"**: The button is enabled only when a year is selected
+3. **Browse Movies**: View movies in a responsive grid layout
+4. **Navigate Pages**: Use Previous/Next buttons to browse through results
+5. **View Details**: Each movie shows poster, title, and release year
 
-## 🎨 CSS Modules Usage
+## Technology Stack
 
-This template uses CSS Modules for component-scoped styling:
+- **React 18** with TypeScript
+- **Vite** for development and building
+- **Chakra UI v3** for components and styling
+- **Axios** for API requests
+- **React Icons** for UI icons
+- **TMDB API** for movie data
 
-```tsx
-// Component.tsx
-import styles from './Component.module.css'
+## API Integration
 
-function Component() {
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Hello World</h1>
-    </div>
-  )
-}
-```
+The app uses TMDB's `/discover/movie` endpoint with the following parameters:
+- `primary_release_year`: Selected birth year
+- `sort_by`: popularity.desc
+- `page`: Current page number
 
-```css
-/* Component.module.css */
-.container {
-  padding: 1rem;
-}
+Movies are displayed 12 per page (3 rows × 4 columns on large screens).
 
-.title {
-  font-size: 2rem;
-  color: #333;
-}
-```
+## Responsive Design
 
-### Benefits
+The grid layout automatically adjusts based on screen size:
+- **Large (lg)**: 4 columns
+- **Medium (md)**: 3 columns  
+- **Small (sm)**: 2 columns
+- **Mobile (base)**: 1 column
 
-- **Scoped styles** - No global CSS conflicts
-- **TypeScript support** - Autocomplete for class names
-- **Automatic optimization** - Vite handles minification and hashing
+## Error Handling
 
-## 🎯 Conditional Styling with clsx
-
-For dynamic class names, this template includes `clsx` for clean conditional styling:
-
-```tsx
-import clsx from 'clsx'
-import styles from './Component.module.css'
-
-function Component({ isActive, isDisabled }) {
-  return (
-    <div
-      className={clsx(styles.button, {
-        [styles.active]: isActive,
-        [styles.disabled]: isDisabled,
-      })}
-    >
-      Dynamic Button
-    </div>
-  )
-}
-```
-
-### clsx Benefits
-
-- **Clean syntax** - No more template literals for complex conditions
-- **Conditional classes** - Easy true/false class toggling
-- **Multiple formats** - Supports strings, objects, arrays
-- **TypeScript friendly** - Full type safety with CSS Modules
-
-## 🔧 Configuration
-
-- ESLint configuration in `eslint.config.js`
-- Stylelint configuration in `.stylelintrc.json`
-- Prettier configuration in `.prettierrc`
-- TypeScript configuration in `tsconfig.json`
-- Vite configuration in `vite.config.ts`
-
-### ESLint Plugins Included
-
-- **react** - React-specific linting rules
-- **react-hooks** - React Hooks rules and best practices
-- **react-refresh** - React Refresh rules for development
-- **typescript-eslint** - TypeScript-specific linting rules
-
-### Modern ESLint + Prettier Setup
-
-This template follows modern best practices by separating concerns:
-
-- **ESLint** handles code quality and logic issues
-- **Prettier** handles code formatting exclusively
-- **eslint-config-prettier** disables conflicting ESLint formatting rules
-- **No eslint-plugin-prettier** - tools run independently for better performance
-
-### Stylelint Configuration
-
-- **stylelint-config-standard** - Standard CSS rules and best practices
-- **Custom rules** - Disabled `selector-class-pattern` for CSS Modules compatibility
-- **Auto-fixable** - Many CSS issues can be automatically fixed
-
-### Code Style Rules
-
-- **No semicolons** at end of lines (ESLint + Prettier)
-- **100 characters** line length (Prettier)
-- **Single quotes** for strings (Prettier)
-- **2 spaces** for indentation (Prettier)
-- **ES5 trailing commas** (Prettier)
-
-## 📝 License
-
-This template is free to use for any project.
+- Network errors are caught and displayed to the user
+- Missing movie posters show a placeholder
+- Loading states are shown during API calls
+- Graceful fallbacks for missing data
