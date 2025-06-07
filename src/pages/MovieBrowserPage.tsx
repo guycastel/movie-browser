@@ -93,35 +93,42 @@ function MovieBrowserPage() {
 
         {/* Search Controls */}
         <Box p={6} borderWidth={1} borderRadius="md">
-          <HStack gap={4} align="end" flexWrap="wrap">
-            <VStack gap={2} align="start">
-              <Text 
-                fontSize="sm" 
-                color={isDarkMode ? "gray.300" : "gray.600"}
+          <form onSubmit={(e) => {
+            e.preventDefault()
+            if (selectedYear && !loading) {
+              handleGoClick()
+            }
+          }}>
+            <HStack gap={4} align="end" flexWrap="wrap">
+              <VStack gap={2} align="start">
+                <Text 
+                  fontSize="sm" 
+                  color={isDarkMode ? "gray.300" : "gray.600"}
+                >
+                  Year:
+                </Text>
+                <Input
+                  type="number"
+                  width='200px'
+                  placeholder="Type a year"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  min={1880}
+                  max={new Date().getFullYear()}
+                  minLength={4}
+                  maxLength={4}
+                />
+              </VStack>
+              <Button
+                type="submit"
+                disabled={!selectedYear || loading}
+                colorPalette="blue"
+                size="md"
               >
-                Year:
-              </Text>
-              <Input
-                type="number"
-                width='200px'
-                placeholder="Type a year"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                min={1880} // First film in TMDB is from 1887
-                max={new Date().getFullYear()}
-                minLength={4}
-                maxLength={4}
-              />
-            </VStack>
-            <Button
-              onClick={handleGoClick}
-              disabled={!selectedYear || loading}
-              colorPalette="blue"
-              size="md"
-            >
-              Go!
-            </Button>
-          </HStack>
+                Go!
+              </Button>
+            </HStack>
+          </form>
         </Box>
 
         {/* Loading Spinner */}
