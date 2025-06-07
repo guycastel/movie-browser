@@ -21,6 +21,7 @@
       "@contexts/*": ["src/contexts/*"],
       "@hooks/*": ["src/hooks/*"],
       "@components/*": ["src/components/*"],
+      "@demos/*": ["src/demos/*"],
       "@services/*": ["src/services/*"],
       "@interfaces/*": ["src/interfaces/*"]
     },

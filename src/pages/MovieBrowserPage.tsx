@@ -11,48 +11,42 @@ import {
   Input,
 } from '@chakra-ui/react'
 import { MdLightMode, MdDarkMode } from 'react-icons/md'
-import { useState } from 'react'
 import { MovieCard } from '@components/MovieCard'
 import { Pagination } from '@components/Pagination'
 import { discoverMovies } from '@services/tmdb'
 import useTheme from '@hooks/useTheme'
-import type { Movie, TMDBResponse } from '@interfaces/tmdb'
+// import { useMovieBrowserReducer } from '@hooks/useMovieBrowserReducer'
+import { useMovieBrowserReducerImmer as useMovieBrowserReducer } from '@hooks/useMovieBrowserReducerImmer'
+import type { TMDBResponse } from '@interfaces/tmdb'
+// import { StateManagementDemo } from '../demos/StateManagementDemo'
+import { EnhancedStateManagementDemo } from '../demos/EnhancedStateManagementDemo'
+import { ImmerPerformanceDemo } from '../demos/ImmerPerformanceDemo'
 
 function MovieBrowserPage() {
-  const [selectedYear, setSelectedYear] = useState<string>('')
-  const [movies, setMovies] = useState<Movie[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
-  const [totalResults, setTotalResults] = useState(0)
-  const [hasSearched, setHasSearched] = useState(false)
-  
+  const [state, actions] = useMovieBrowserReducer()
   const { isDarkMode, toggleColorMode } = useTheme()
 
   const ITEMS_PER_PAGE = 12
 
   const handleSearch = async (page: number = 1) => {
-    if (!selectedYear) return
+    if (!state.selectedYear) return
 
-    setLoading(true)
-    setError(null)
+    actions.searchStart()
 
     try {
       const response: TMDBResponse = await discoverMovies({
         page,
-        primary_release_year: parseInt(selectedYear),
+        primary_release_year: parseInt(state.selectedYear),
       })
 
-      setMovies(response.results)
-      setCurrentPage(response.page)
-      setTotalPages(response.total_pages)
-      setTotalResults(response.total_results)
-      setHasSearched(true)
+      actions.searchSuccess({
+        movies: response.results,
+        page: response.page,
+        totalPages: response.total_pages,
+        totalResults: response.total_results,
+      })
     } catch {
-      setError('Failed to fetch movies. Please try again.')
-    } finally {
-      setLoading(false)
+      actions.searchError('Failed to fetch movies. Please try again.')
     }
   }
 
@@ -61,14 +55,13 @@ function MovieBrowserPage() {
   }
 
   const handleGoClick = () => {
-    setCurrentPage(1)
+    actions.setPage(1)
     handleSearch(1)
   }
 
   return (
     <Container maxW="7xl" py={8}>
       <VStack gap={8} align="stretch">
-        
         {/* Header with theme toggle */}
         <HStack justify="space-between" align="center">
           <Text fontSize="3xl" fontWeight="bold">
@@ -80,39 +73,46 @@ function MovieBrowserPage() {
             variant="outline"
             size="md"
             colorPalette="gray"
-            bg={isDarkMode ? "gray.700" : "white"}
-            borderColor={isDarkMode ? "gray.600" : "gray.200"}
-            color={isDarkMode ? "gray.100" : "gray.700"}
+            bg={isDarkMode ? 'gray.700' : 'white'}
+            borderColor={isDarkMode ? 'gray.600' : 'gray.200'}
+            color={isDarkMode ? 'gray.100' : 'gray.700'}
             _hover={{
-              bg: isDarkMode ? "gray.600" : "gray.50"
+              bg: isDarkMode ? 'gray.600' : 'gray.50',
             }}
           >
             {isDarkMode ? <MdLightMode size={20} /> : <MdDarkMode size={20} />}
           </IconButton>
         </HStack>
 
+        {/* Development Demo - Remove in production */}
+        {import.meta.env.DEV && (
+          <VStack gap={6}>
+            <EnhancedStateManagementDemo />
+            <ImmerPerformanceDemo />
+          </VStack>
+        )}
+
         {/* Search Controls */}
         <Box p={6} borderWidth={1} borderRadius="md">
-          <form onSubmit={(e) => {
-            e.preventDefault()
-            if (selectedYear && !loading) {
-              handleGoClick()
-            }
-          }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (state.selectedYear && !state.loading) {
+                handleGoClick()
+              }
+            }}
+          >
             <HStack gap={4} align="end" flexWrap="wrap">
               <VStack gap={2} align="start">
-                <Text 
-                  fontSize="sm" 
-                  color={isDarkMode ? "gray.300" : "gray.600"}
-                >
+                <Text fontSize="sm" color={isDarkMode ? 'gray.300' : 'gray.600'}>
                   Year:
                 </Text>
                 <Input
                   type="number"
-                  width='200px'
+                  width="200px"
                   placeholder="Type a year"
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
+                  value={state.selectedYear}
+                  onChange={(e) => actions.setSelectedYear(e.target.value)}
                   min={1880}
                   max={new Date().getFullYear()}
                   minLength={4}
@@ -121,7 +121,7 @@ function MovieBrowserPage() {
               </VStack>
               <Button
                 type="submit"
-                disabled={!selectedYear || loading}
+                disabled={!state.selectedYear || state.loading}
                 colorPalette="blue"
                 size="md"
               >
@@ -132,7 +132,7 @@ function MovieBrowserPage() {
         </Box>
 
         {/* Loading Spinner */}
-        {loading && (
+        {state.loading && (
           <Box display="flex" justifyContent="center" py={8}>
             <VStack gap={4}>
               <Spinner size="xl" color="blue.500" />
@@ -142,14 +142,14 @@ function MovieBrowserPage() {
         )}
 
         {/* Error Message */}
-        {error && (
+        {state.error && (
           <Box p={4} bg="red.100" borderRadius="md" border="1px solid" borderColor="red.300">
-            <Text color="red.700">{error}</Text>
+            <Text color="red.700">{state.error}</Text>
           </Box>
         )}
 
         {/* Movies Grid */}
-        {hasSearched && !loading && !error && movies.length > 0 && (
+        {state.hasSearched && !state.loading && !state.error && state.movies.length > 0 && (
           <VStack gap={6} align="stretch">
             <Grid
               templateColumns={{
@@ -160,7 +160,7 @@ function MovieBrowserPage() {
               }}
               gap={6}
             >
-              {movies.map((movie) => (
+              {state.movies.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
             </Grid>
@@ -168,9 +168,9 @@ function MovieBrowserPage() {
             {/* Pagination */}
             <Box display="flex" justifyContent="center" py={4}>
               <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalResults={totalResults}
+                currentPage={state.currentPage}
+                totalPages={state.totalPages}
+                totalResults={state.totalResults}
                 itemsPerPage={ITEMS_PER_PAGE}
                 onPageChange={handlePageChange}
               />
@@ -179,10 +179,10 @@ function MovieBrowserPage() {
         )}
 
         {/* No Results */}
-        {hasSearched && !loading && !error && movies.length === 0 && (
+        {state.hasSearched && !state.loading && !state.error && state.movies.length === 0 && (
           <Box textAlign="center" py={8}>
             <Text fontSize="lg" color="gray.500">
-              No movies found for the year {selectedYear}
+              No movies found for the year {state.selectedYear}
             </Text>
           </Box>
         )}

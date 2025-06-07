@@ -76,6 +76,17 @@ The app will be available at `http://localhost:5173`
 - **React Icons** for UI icons
 - **TMDB API** for movie data
 
+## State Management Demos
+
+This project includes interactive demos showcasing advanced state management patterns in the `src/demos/` folder:
+
+- **useReducer patterns** - Atomic state updates and predictable transitions
+- **Immer integration** - Complex nested state with simple syntax
+- **State machines** - Preventing invalid states (e.g., image loading)
+- **Performance comparisons** - Real-time measurements of different approaches
+
+The demos are automatically displayed in development mode and excluded from production builds. See `src/demos/README.md` for detailed information.
+
 ## API Integration
 
 The app uses TMDB's `/discover/movie` endpoint with the following parameters:

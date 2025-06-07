@@ -1,15 +1,14 @@
 import { Box, Image, Text, VStack, Skeleton } from '@chakra-ui/react'
-import { useState } from 'react'
 import type { Movie } from '@interfaces/tmdb'
 import { getPosterUrl } from '@services/tmdb'
+import { useImageLoadingReducer } from '@hooks/useImageLoadingReducer'
 
 interface MovieCardProps {
   movie: Movie
 }
 
 export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
+  const [imageState, imageActions] = useImageLoadingReducer()
 
   const posterUrl = getPosterUrl(movie.poster_path)
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown'
@@ -22,10 +21,10 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
         aspectRatio="2/3"
         overflow="hidden"
       >
-        {!imageLoaded && !imageError && (
+        {!imageState.loaded && !imageState.error && (
           <Skeleton height="100%" width="100%" borderRadius="md" />
         )}
-        {posterUrl && !imageError && (
+        {posterUrl && !imageState.error && (
           <Image
             src={posterUrl}
             alt={movie.title}
@@ -33,12 +32,12 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
             height="100%"
             objectFit="cover"
             borderRadius="md"
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
-            display={imageLoaded ? 'block' : 'none'}
+            onLoad={imageActions.loadSuccess}
+            onError={imageActions.loadError}
+            display={imageState.loaded ? 'block' : 'none'}
           />
         )}
-        {(imageError || !posterUrl) && imageLoaded && (
+        {(imageState.error || !posterUrl) && (
           <Box
             height="100%"
             width="100%"

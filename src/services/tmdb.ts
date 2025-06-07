@@ -4,7 +4,7 @@ import type { TMDBResponse, DiscoverMoviesParams } from '@interfaces/tmdb'
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p'
 
-// TODO: fallback for missiong API key 
+// Put "your_api_key_here" only when necessary for local testing
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY ?? 'your_api_key_here'
 
 export const tmdbApi = axios.create({
