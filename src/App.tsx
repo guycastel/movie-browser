@@ -8,14 +8,15 @@ import {
   Grid,
   Spinner,
   IconButton,
+  Input,
 } from '@chakra-ui/react'
 import { MdLightMode, MdDarkMode } from 'react-icons/md'
 import { useState } from 'react'
-import { MovieCard } from './components/MovieCard'
-import { Pagination } from './components/Pagination'
-import { discoverMovies } from './services/tmdb'
-import { useTheme } from './contexts/ThemeContext'
-import type { Movie, TMDBResponse } from './types/tmdb'
+import { MovieCard } from '@components/MovieCard'
+import { Pagination } from '@components/Pagination'
+import { discoverMovies } from '@services/tmdb'
+import useTheme from '@hooks/useTheme'
+import type { Movie, TMDBResponse } from '@interfaces/tmdb'
 
 function App() {
   const [selectedYear, setSelectedYear] = useState<string>('')
@@ -27,14 +28,9 @@ function App() {
   const [totalResults, setTotalResults] = useState(0)
   const [hasSearched, setHasSearched] = useState(false)
   
-  // Use the theme context instead of local state
   const { isDarkMode, toggleColorMode } = useTheme()
 
   const ITEMS_PER_PAGE = 12
-
-  // Generate years from 1900 to current year
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: currentYear - 1899 }, (_, i) => currentYear - i)
 
   const handleSearch = async (page: number = 1) => {
     if (!selectedYear) return
@@ -72,6 +68,7 @@ function App() {
   return (
     <Container maxW="7xl" py={8}>
       <VStack gap={8} align="stretch">
+        
         {/* Header with theme toggle */}
         <HStack justify="space-between" align="center">
           <Text fontSize="3xl" fontWeight="bold">
@@ -104,25 +101,17 @@ function App() {
               >
                 Year:
               </Text>
-              <select
+              <Input
+                type="number"
+                width='200px'
+                placeholder="Type a year"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${isDarkMode ? '#4a5568' : '#e2e8f0'}`,
-                  backgroundColor: isDarkMode ? '#2d3748' : '#ffffff',
-                  color: isDarkMode ? '#f7fafc' : '#1a202c',
-                  width: '200px',
-                }}
-              >
-                <option value="">Choose a year</option>
-                {years.map((year) => (
-                  <option key={year} value={year.toString()}>
-                    {year}
-                  </option>
-                ))}
-              </select>
+                min={1880} // First film in TMDB is from 1887
+                max={new Date().getFullYear()}
+                minLength={4}
+                maxLength={4}
+              />
             </VStack>
             <Button
               onClick={handleGoClick}

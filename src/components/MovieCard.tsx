@@ -1,7 +1,7 @@
 import { Box, Image, Text, VStack, Skeleton } from '@chakra-ui/react'
 import { useState } from 'react'
-import type { Movie } from '../types/tmdb'
-import { getPosterUrl } from '../services/tmdb'
+import type { Movie } from '@interfaces/tmdb'
+import { getPosterUrl } from '@services/tmdb'
 
 interface MovieCardProps {
   movie: Movie

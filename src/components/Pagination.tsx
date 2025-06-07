@@ -1,6 +1,6 @@
 import { HStack, Text, Button, VStack } from '@chakra-ui/react'
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md'
-import { useTheme } from '../contexts/ThemeContext'
+import useTheme from '@hooks/useTheme'
 
 interface PaginationProps {
   currentPage: number
